@@ -9,8 +9,8 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env from CLI directory
-dotenv.config({ path: join(__dirname, '.env') });
+// Load .env from CLI directory (override: false = env vars take priority over .env file)
+dotenv.config({ path: join(__dirname, '.env'), override: false });
 
 const BASE_URL = 'https://app.metricool.com/api';
 
