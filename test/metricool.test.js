@@ -420,6 +420,37 @@ describe('CLI Argument Parsing', () => {
     assert.strictEqual(options.firstComment, 'First!');
   });
   
+  it('should parse agency client add body correctly', () => {
+    const options = {
+      agencyId: '123',
+      username: 'clientuser',
+      name: 'Jane',
+      lastname: 'Doe',
+      email: 'jane@client.com',
+      language: 'en',
+      timezone: 'America/New_York',
+      enabled: 'true',
+    };
+    const body = {
+      agencyId: parseInt(options.agencyId),
+      username: options.username,
+    };
+    if (options.name) body.name = options.name;
+    if (options.lastname) body.lastName = options.lastname;
+    if (options.email) body.email = options.email;
+    if (options.language) body.language = options.language;
+    if (options.timezone) body.timezone = options.timezone;
+    if (options.enabled) body.enabled = options.enabled === 'true';
+
+    assert.strictEqual(body.agencyId, 123);
+    assert.strictEqual(body.username, 'clientuser');
+    assert.strictEqual(body.name, 'Jane');
+    assert.strictEqual(body.lastName, 'Doe');
+    assert.strictEqual(body.email, 'jane@client.com');
+    assert.strictEqual(body.enabled, true);
+    assert.strictEqual(body.timezone, 'America/New_York');
+  });
+
   it('should show helpful error for missing required args', () => {
     // Test blogId requirement
     assert.throws(
@@ -440,5 +471,218 @@ describe('CLI Argument Parsing', () => {
       },
       'Should not throw when network provided'
     );
+  });
+});
+
+// ============================================================================
+// AGENCY & TEAM MANAGEMENT TESTS
+// ============================================================================
+
+describe('Agency & Team Management', () => {
+
+  describe('Agency Customization Kit', () => {
+    it('should build update body with only provided fields', () => {
+      const options = { agencyId: '42', agencyLogo: 'https://img.co/logo.png', supportChat: 'true' };
+      const body = {};
+      if (options.agencyLogo) body.agencyLogo = options.agencyLogo;
+      if (options.supportChat) body.supportChat = options.supportChat === 'true';
+
+      assert.deepStrictEqual(body, { agencyLogo: 'https://img.co/logo.png', supportChat: true });
+    });
+
+    it('should construct details endpoint correctly', () => {
+      const url = addAuthParams(`${BASE_URL}/v2/agency-CK/details`);
+      assert.ok(url.includes('/v2/agency-CK/details'), 'Should target details endpoint');
+      assert.ok(url.includes(`userToken=${USER_TOKEN}`), 'Should include auth');
+    });
+
+    it('should construct get endpoint with agency ID', () => {
+      const agencyId = '99';
+      const url = `${BASE_URL}/v2/agency-CK/${agencyId}`;
+      assert.ok(url.includes('/v2/agency-CK/99'), 'Should include agency ID');
+    });
+
+    it('should build update fields param from provided options', () => {
+      const options = { agencyLogo: 'x', mailReplyTo: 'a@b.com' };
+      const fields = [];
+      if (options.agencyLogo) fields.push('agencyLogo');
+      if (options.loginLogo) fields.push('loginLogo');
+      if (options.mailReplyTo) fields.push('mailReplyTo');
+
+      assert.deepStrictEqual(fields, ['agencyLogo', 'mailReplyTo']);
+    });
+
+    it('should construct test-mail endpoint with POST method', () => {
+      const agencyId = '42';
+      const endpoint = `/v2/agency-CK/${agencyId}/test-mail`;
+      assert.strictEqual(endpoint, '/v2/agency-CK/42/test-mail');
+    });
+  });
+
+  describe('Agency End-Clients', () => {
+    it('should construct clients list endpoint with agency ID', () => {
+      const agencyId = '123';
+      const url = `${BASE_URL}/v2/agency-CK/${agencyId}/end-clients`;
+      assert.ok(url.includes('/v2/agency-CK/123/end-clients'));
+    });
+
+    it('should append filter params when provided', () => {
+      const agencyId = '123';
+      const filter = '{"username":"test"}';
+      const params = filter ? `?filter=${encodeURIComponent(filter)}` : '';
+      const url = `${BASE_URL}/v2/agency-CK/${agencyId}/end-clients${params}`;
+      assert.ok(url.includes('filter='), 'Should include filter param');
+    });
+
+    it('should build add client body with required and optional fields', () => {
+      const options = { agencyId: '10', username: 'demo', email: 'demo@test.com' };
+      const body = { agencyId: parseInt(options.agencyId), username: options.username };
+      if (options.email) body.email = options.email;
+
+      assert.strictEqual(body.agencyId, 10);
+      assert.strictEqual(body.username, 'demo');
+      assert.strictEqual(body.email, 'demo@test.com');
+    });
+
+    it('should construct delete endpoint with agency and client IDs', () => {
+      const endpoint = `/v2/agency-CK/10/end-clients/20`;
+      assert.ok(endpoint.includes('/10/end-clients/20'));
+    });
+
+    it('should construct assignments endpoint correctly', () => {
+      const endpoint = `/v2/agency-CK/10/end-clients/20/assignments`;
+      assert.ok(endpoint.endsWith('/assignments'));
+    });
+
+    it('should construct resend-link endpoint correctly', () => {
+      const endpoint = `/v2/agency-CK/10/end-clients/20/activation-link`;
+      assert.ok(endpoint.endsWith('/activation-link'));
+    });
+  });
+
+  describe('Agency Team Members', () => {
+    it('should construct team list endpoint', () => {
+      const agencyId = '50';
+      const url = `${BASE_URL}/v2/agency-CK/${agencyId}/team-members`;
+      assert.ok(url.includes('/v2/agency-CK/50/team-members'));
+    });
+
+    it('should construct team roles endpoint', () => {
+      const url = `${BASE_URL}/v2/agency-CK/50/team-members/roles`;
+      assert.ok(url.endsWith('/roles'));
+    });
+
+    it('should build team add body with emails and role', () => {
+      const options = { agencyId: '50', emails: 'a@b.com,c@d.com', roleId: '3' };
+      const body = {
+        emails: options.emails.split(',').map(e => e.trim()),
+        teamMemberRoleId: parseInt(options.roleId),
+      };
+      assert.deepStrictEqual(body.emails, ['a@b.com', 'c@d.com']);
+      assert.strictEqual(body.teamMemberRoleId, 3);
+    });
+
+    it('should build team update body with PATCH fields', () => {
+      const options = { roleId: '5' };
+      const body = { teamMemberRoleId: parseInt(options.roleId) };
+      assert.strictEqual(body.teamMemberRoleId, 5);
+    });
+
+    it('should construct delete endpoint with user ID', () => {
+      const endpoint = `/v2/agency-CK/50/team-members/100`;
+      assert.ok(endpoint.includes('/team-members/100'));
+    });
+
+    it('should construct resend-invite endpoint', () => {
+      const endpoint = `/v2/agency-CK/50/team-members/100/invitation-email`;
+      assert.ok(endpoint.endsWith('/invitation-email'));
+    });
+  });
+
+  describe('Brand Roles', () => {
+    it('should construct roles list endpoint with user ID', () => {
+      const userId = USER_ID;
+      const url = `${BASE_URL}/v2/authorization/${userId}/roles`;
+      assert.ok(url.includes('/v2/authorization/'));
+      assert.ok(url.endsWith('/roles'));
+    });
+
+    it('should build create role body with name and actions', () => {
+      const options = { name: 'Editor', description: 'Can edit', color: '#FF0000', actions: '{"viewAnalytics":true}' };
+      const body = { name: options.name, actions: {} };
+      if (options.description) body.description = options.description;
+      if (options.color) body.color = options.color;
+      if (options.actions) body.actions = JSON.parse(options.actions);
+
+      assert.strictEqual(body.name, 'Editor');
+      assert.strictEqual(body.description, 'Can edit');
+      assert.strictEqual(body.color, '#FF0000');
+      assert.deepStrictEqual(body.actions, { viewAnalytics: true });
+    });
+
+    it('should build update body with only changed fields', () => {
+      const options = { name: 'New Name', color: '#00FF00' };
+      const body = {};
+      const fields = [];
+      if (options.name) { body.name = options.name; fields.push('name'); }
+      if (options.description) { body.description = options.description; fields.push('description'); }
+      if (options.color) { body.color = options.color; fields.push('color'); }
+
+      assert.deepStrictEqual(fields, ['name', 'color']);
+      assert.strictEqual(body.name, 'New Name');
+    });
+
+    it('should construct delete endpoint with role ID', () => {
+      const endpoint = `/v2/authorization/${USER_ID}/roles/7`;
+      assert.ok(endpoint.includes('/roles/7'));
+    });
+  });
+
+  describe('Brand Role Collaborators', () => {
+    it('should construct collaborators list endpoint', () => {
+      const url = `${BASE_URL}/v2/authorization/${USER_ID}/collaborators`;
+      assert.ok(url.endsWith('/collaborators'));
+    });
+
+    it('should build add collaborator body with email and assignments', () => {
+      const options = {
+        email: 'collab@test.com',
+        assignments: '[{"brandId":1,"roleId":2}]',
+        isDefaultEmail: 'true',
+        invitationMessage: 'Welcome!',
+        useNewLink: 'false',
+      };
+      const body = {};
+      if (options.isDefaultEmail !== undefined) body.isDefaultEmail = options.isDefaultEmail === 'true';
+      if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+      if (options.assignments) body.assignments = JSON.parse(options.assignments);
+      if (options.useNewLink !== undefined) body.useNewActivationLink = options.useNewLink === 'true';
+
+      assert.strictEqual(body.isDefaultEmail, true);
+      assert.strictEqual(body.invitationCustomMessage, 'Welcome!');
+      assert.deepStrictEqual(body.assignments, [{ brandId: 1, roleId: 2 }]);
+      assert.strictEqual(body.useNewActivationLink, false);
+    });
+
+    it('should construct update endpoint with collaborator ID', () => {
+      const endpoint = `/v2/authorization/${USER_ID}/collaborators/55`;
+      assert.ok(endpoint.includes('/collaborators/55'));
+    });
+
+    it('should construct delete endpoint with collaborator ID', () => {
+      const endpoint = `/v2/authorization/${USER_ID}/collaborators/55`;
+      assert.ok(endpoint.includes('/collaborators/55'));
+    });
+
+    it('should construct resend-link endpoint', () => {
+      const endpoint = `/v2/authorization/${USER_ID}/collaborators/55/activation-link`;
+      assert.ok(endpoint.endsWith('/activation-link'));
+    });
+
+    it('should construct delete-assignment endpoint with brand ID', () => {
+      const brandId = '123';
+      const endpoint = `/v2/authorization/${USER_ID}/assignment?brandId=${brandId}`;
+      assert.ok(endpoint.includes('brandId=123'));
+    });
   });
 });

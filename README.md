@@ -271,6 +271,121 @@ metricool calendar events --start 2026-02-01T00:00:00 --end 2026-02-28T23:59:59
 metricool calendar create --name "Content Calendar"
 ```
 
+### 🏢 Agency & Team Management
+
+Manage your agency's customization, end-clients, team members, roles, and collaborators. All agency commands live under `metricool agency`.
+
+#### Customization Kit
+
+```bash
+# Get agency details for current user
+metricool agency customize details
+
+# Get customization by agency ID
+metricool agency customize get --agency-id 123
+
+# Update branding (logos, mail settings, feature toggles)
+metricool agency customize update --agency-id 123 \
+  --agency-logo "https://example.com/logo.png" \
+  --mail-reply-to "support@agency.com" \
+  --support-chat true
+
+# Send a test email
+metricool agency customize test-mail --agency-id 123 --to "test@agency.com"
+```
+
+#### End-Clients
+
+```bash
+# List all end-clients
+metricool agency clients list --agency-id 123
+
+# Add a new end-client
+metricool agency clients add --agency-id 123 \
+  --username "clientuser" \
+  --name "Jane" --lastname "Doe" \
+  --email "jane@client.com" \
+  --timezone "America/New_York"
+
+# Delete an end-client
+metricool agency clients delete --agency-id 123 --client-id 456
+
+# Update brand assignments
+metricool agency clients assignments --agency-id 123 --client-id 456 \
+  --assignments '[{"brandId":789,"roleId":1}]'
+
+# Resend activation link
+metricool agency clients resend-link --agency-id 123 --client-id 456
+```
+
+#### Team Members
+
+```bash
+# List team members
+metricool agency team list --agency-id 123
+
+# List available team roles
+metricool agency team roles --agency-id 123
+
+# Add team members by email
+metricool agency team add --agency-id 123 \
+  --emails "alice@agency.com,bob@agency.com" \
+  --role-id 1
+
+# Update a member's role
+metricool agency team update --agency-id 123 --user-id 789 --role-id 2
+
+# Remove a team member
+metricool agency team delete --agency-id 123 --user-id 789
+
+# Resend invitation
+metricool agency team resend-invite --agency-id 123 --user-id 789
+```
+
+#### Brand Roles
+
+```bash
+# List brand roles
+metricool agency roles list
+
+# Create a role with permissions
+metricool agency roles create --name "Content Creator" \
+  --description "Can create and schedule posts" \
+  --color "#FF5733" \
+  --actions '{"viewAnalytics":true,"fullAccessPlanner":true}'
+
+# Update a role
+metricool agency roles update --role-id 1 --name "Senior Creator" --color "#00FF00"
+
+# Delete a role
+metricool agency roles delete --role-id 1
+```
+
+#### Collaborators
+
+```bash
+# List collaborators
+metricool agency collaborators list
+
+# Add a collaborator with brand role assignments
+metricool agency collaborators add --email "freelancer@example.com" \
+  --assignments '[{"brandId":123,"roleId":1}]' \
+  --invitation-message "Welcome to the team!"
+
+# Update collaborator assignments
+metricool agency collaborators update --collaborator-id 456 \
+  --assignments '[{"brandId":123,"roleId":2}]'
+
+# Delete a collaborator
+metricool agency collaborators delete --collaborator-id 456
+
+# Resend activation link
+metricool agency collaborators resend-link --collaborator-id 456
+
+# Delete a specific brand role assignment
+metricool agency collaborators delete-assignment --brand-id 123
+```
+
 ### 🛠️ Utilities
 
 ```bash
