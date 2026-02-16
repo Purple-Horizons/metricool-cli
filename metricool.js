@@ -3,8 +3,14 @@
 import { Command } from 'commander';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env from CLI directory
+dotenv.config({ path: join(__dirname, '.env') });
 
 const BASE_URL = 'https://app.metricool.com/api';
 
@@ -94,12 +100,18 @@ async function createPost(options) {
   // Parse media URLs if provided
   const media = options.media ? options.media.split(',').map(m => m.trim()) : [];
 
+  // Format date properly (yyyy-MM-dd'T'HH:mm:ss without milliseconds)
+  const formatDate = (date) => {
+    const d = new Date(date || Date.now());
+    return d.toISOString().split('.')[0]; // Remove milliseconds and Z
+  };
+
   // Build post data
   const postData = {
     text: options.text || '',
     providers,
     publicationDate: {
-      date: options.date || new Date().toISOString(),
+      dateTime: formatDate(options.date),
       timezone: options.timezone || 'America/New_York',
     },
     draft: options.draft || false,
@@ -115,14 +127,14 @@ async function createPost(options) {
   // Add LinkedIn-specific data
   if (options.linkedinType) {
     postData.linkedinData = {
-      postType: options.linkedinType,
+      type: options.linkedinType,
     };
   }
 
   // Add Instagram-specific data
   if (options.instagramType) {
     postData.instagramData = {
-      postType: options.instagramType,
+      type: options.instagramType,
     };
   }
 
@@ -143,7 +155,7 @@ async function updatePost(id, options) {
   if (options.text) updateData.text = options.text;
   if (options.date) {
     updateData.publicationDate = {
-      date: options.date,
+      dateTime: options.date,
       timezone: options.timezone || 'America/New_York',
     };
   }
