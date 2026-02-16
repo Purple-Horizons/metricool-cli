@@ -1,499 +1,316 @@
-# Metricool CLI
+<p align="center">
+  <img src="assets/header.png" alt="Metricool CLI" width="100%" />
+</p>
 
-Full-featured command-line interface for the Metricool API.
+<h1 align="center">Metricool CLI</h1>
 
-## Installation
+<p align="center">
+  <strong>The missing command-line interface for Metricool.</strong><br>
+  Schedule posts, pull analytics, track competitors, manage inbox — all from your terminal.
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#commands">Commands</a> •
+  <a href="#why">Why?</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+---
+
+## Why?
+
+Metricool's MCP server can **read** your data but **can't schedule posts** — the `providers` field gets sent as strings (`["linkedin"]`) instead of objects (`[{"network":"linkedin"}]`). We hit this wall, so we built the full thing.
+
+100+ commands. Every Metricool API endpoint. Works with AI agents, cron jobs, or just your terminal.
+
+**Built by [Purple Horizons](https://purplehorizons.io)** — an AI consultancy in Miami that builds tools like this for breakfast.
+
+## Install
 
 ```bash
+# From GitHub
+git clone https://github.com/Purple-Horizons/metricool-cli.git
+cd metricool-cli
 npm install
-npm link  # Make globally available
+npm link
 ```
 
-## Configuration
+## Quick Start
 
-Create a `.env` file in the CLI directory:
+**1. Get your credentials** from [Metricool account settings](https://app.metricool.com/settings).
+
+**2. Create `.env`** in the CLI directory:
 
 ```env
-METRICOOL_USER_TOKEN=your_user_token_here
-METRICOOL_USER_ID=your_user_id_here
-METRICOOL_BLOG_ID=your_default_blog_id_here
+METRICOOL_USER_TOKEN=your_token
+METRICOOL_USER_ID=your_user_id
+METRICOOL_BLOG_ID=your_default_blog_id
 ```
 
-Get your credentials from Metricool account settings.
-
-## Usage
-
-All commands support:
-- `--blog-id <id>` — Override default blog ID
-- `--json` or `-j` — Output as JSON (default)
-
-### Brands & Admin
+**3. Verify it works:**
 
 ```bash
-# List all brands
 metricool brands
-
-# Get best time to publish
-metricool best-time --blog-id 4846146
+metricool ping
 ```
 
-### Posts
+## Commands
+
+Every command supports `--blog-id <id>` to override the default brand.
+
+### 📝 Posts
+
+The command you came here for. Create, schedule, update, and delete posts across all networks.
 
 ```bash
-# List scheduled posts
-metricool post list --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
-
-# Create a new post
+# Schedule a LinkedIn post for 3pm today
 metricool post create \
-  --text "Hello LinkedIn!" \
+  --text "Just shipped a new feature!" \
   --network linkedin \
   --date "2026-02-16T15:00:00" \
   --timezone "America/New_York"
 
-# Create with media
+# Multi-network with image
 metricool post create \
-  --text "Check this out!" \
-  --network instagram,facebook \
-  --media "https://example.com/image1.jpg,https://example.com/image2.jpg"
+  --text "Check this out 🚀" \
+  --network linkedin,instagram,twitter \
+  --media "https://example.com/image.png" \
+  --date "2026-02-17T10:00:00" \
+  --timezone "America/New_York"
 
-# Update a post
-metricool post update POST_ID --text "Updated text"
+# Create as draft (won't auto-publish)
+metricool post create \
+  --text "Draft for review" \
+  --network linkedin \
+  --draft
 
-# Delete a post
-metricool post delete POST_ID
+# With first comment
+metricool post create \
+  --text "Big announcement!" \
+  --network linkedin \
+  --first-comment "Link to full article: https://example.com"
 
-# Post notes
-metricool post notes --post-id POST_ID
-metricool post notes --post-id POST_ID --note "Needs review"
+# List scheduled posts
+metricool post list \
+  --start "2026-02-01T00:00:00" \
+  --end "2026-02-28T23:59:59"
 
-# Approval workflow
-metricool post approve --post-id POST_ID --status approved --comment "Looks good!"
+# Update existing post
+metricool post update 12345 --text "Updated copy"
+
+# Delete
+metricool post delete 12345
+
+# Notes & approvals
+metricool post notes --post-id 12345
+metricool post notes --post-id 12345 --note "Ready for review"
+metricool post approve --post-id 12345 --status approved
 metricool post tasks --status pending
 ```
 
-### Analytics (Highest Priority)
+**Supported networks:** `linkedin`, `instagram`, `twitter`, `facebook`, `threads`, `tiktok`, `bluesky`, `pinterest`, `youtube`
+
+**Network-specific options:**
+- `--linkedin-type POST` (or `poll`)
+- `--instagram-type POST` (or `REEL`, `STORY`)
+
+### 📊 Analytics
+
+Pull performance data for any network and time period.
 
 ```bash
-# Time series for any metric
-metricool analytics timeline \
-  --metric followers \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+# Posts by network
+metricool analytics posts linkedin --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+metricool analytics posts instagram --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 
-# Distribution data
-metricool analytics distribution \
-  --metric engagement \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+# Reels & Stories
+metricool analytics reels instagram --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+metricool analytics stories instagram --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 
-# Aggregated metrics
-metricool analytics aggregation \
-  --metric reach \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+# Time series, distribution, aggregation
+metricool analytics timeline --metric followers --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+metricool analytics distribution --metric engagement --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+metricool analytics aggregation --metric reach --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 
-# Posts analytics by network
-metricool analytics posts linkedin \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59 \
-  --sort engagement \
-  --order desc
-
-# Supported networks: instagram, linkedin, twitter, facebook, tiktok, threads, bluesky, pinterest
-
-# Reels analytics
-metricool analytics reels instagram \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-
-# Stories analytics
-metricool analytics stories instagram \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-
-# Hashtag analytics
-metricool analytics hashtags \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+# Hashtag performance
+metricool analytics hashtags --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 ```
 
-### Competitors
+### 🕵️ Competitors
+
+Track and analyze competitor accounts.
 
 ```bash
-# List competitors for a network
 metricool competitors list instagram
-
-# Add a competitor
 metricool competitors add instagram --username competitor_handle
-
-# Remove a competitor
 metricool competitors remove instagram --id COMPETITOR_ID
-
-# Get competitor posts
-metricool competitors posts instagram \
-  --id COMPETITOR_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-
-# Competitor timeline metrics
-metricool competitors timelines \
-  --metric followers \
-  --competitor-id COMPETITOR_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+metricool competitors posts instagram --id COMPETITOR_ID --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+metricool competitors timelines --metric followers --competitor-id COMPETITOR_ID --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 ```
 
-### Inbox / Conversations
+### 📬 Inbox
+
+Manage conversations, comments, and reviews.
 
 ```bash
-# List conversations
 metricool inbox list --network instagram --status unread
-
-# Reply to conversation
-metricool inbox reply \
-  --conversation-id CONV_ID \
-  --message "Thanks for reaching out!"
-
-# List post comments
+metricool inbox reply --conversation-id CONV_ID --message "Thanks!"
 metricool inbox comments --network facebook --post-id POST_ID
-
-# Reply to comment
-metricool inbox comment-reply \
-  --comment-id COMMENT_ID \
-  --message "Thank you!"
-
-# List reviews
+metricool inbox comment-reply --comment-id COMMENT_ID --message "Appreciate it!"
 metricool inbox reviews --network google
-
-# Reply to review
-metricool inbox review-reply \
-  --review-id REVIEW_ID \
-  --message "We appreciate your feedback!"
+metricool inbox review-reply --review-id REVIEW_ID --message "Thank you for the feedback!"
 ```
 
-### Smart Links (Link in Bio)
+### 🤖 AI Features
 
-```bash
-# List smart links
-metricool smartlinks list
-
-# Create a smart link
-metricool smartlinks create \
-  --title "My Website" \
-  --url "https://example.com" \
-  --description "Check out my site"
-
-# Update a smart link
-metricool smartlinks update \
-  --id LINK_ID \
-  --title "Updated Title" \
-  --url "https://newurl.com"
-
-# Delete a smart link
-metricool smartlinks delete --id LINK_ID
-
-# Get smart link analytics
-metricool smartlinks analytics \
-  --id LINK_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-```
-
-### AI Features
+Generate content and schedule with natural language.
 
 ```bash
 # Generate post copy
-metricool ai generate \
-  --prompt "Write a LinkedIn post about AI in marketing" \
-  --language en \
-  --tone professional \
-  --network linkedin
+metricool ai generate --prompt "Write about AI in marketing" --language en --tone professional --network linkedin
 
-# Regenerate post
-metricool ai regenerate \
-  --post-id POST_ID \
-  --tone casual
-
-# Quick actions (shorten, lengthen, rephrase, etc.)
-metricool ai quick-action \
-  --text "This is my post text that needs to be shortened" \
-  --action shorten \
-  --language en
+# Quick actions
+metricool ai quick-action --text "Long text that needs shortening" --action shorten
 
 # Natural language scheduling
-metricool ai schedule \
-  --text "tomorrow at 3pm" \
-  --timezone "America/New_York"
-
-# Check scheduling job status
+metricool ai schedule --text "next Monday at 9am" --timezone "America/New_York"
 metricool ai schedule-status --job-id JOB_ID
 
-# List available languages
+# Available languages
 metricool ai languages
 ```
 
-### Post Library
+### 🔗 Smart Links
+
+Manage link-in-bio pages.
 
 ```bash
-# List library posts
-metricool library list --limit 50 --offset 0
+metricool smartlinks list
+metricool smartlinks create --title "My Site" --url "https://example.com"
+metricool smartlinks update --id LINK_ID --title "Updated"
+metricool smartlinks delete --id LINK_ID
+metricool smartlinks analytics --id LINK_ID --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
+```
 
-# Create library post
-metricool library create \
-  --text "Reusable post content" \
-  --media "https://example.com/image.jpg"
+### 📚 Post Library
 
-# Update library post
-metricool library update \
-  --id POST_ID \
-  --text "Updated content"
+Save reusable content templates.
 
-# Delete library post
+```bash
+metricool library list
+metricool library create --text "Reusable post content" --media "https://example.com/img.jpg"
+metricool library update --id POST_ID --text "Updated"
 metricool library delete --id POST_ID
 ```
 
-### Hashtag Tracker
+### #️⃣ Hashtag Tracker
 
 ```bash
-# List tracked hashtags
 metricool hashtags list
-
-# Track a new hashtag
 metricool hashtags create --hashtag marketing
-
-# Get hashtag statistics
-metricool hashtags stats \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
+metricool hashtags stats --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 ```
 
-### Reports
+### 📈 Reports & Dashboards
 
 ```bash
-# List reports
+# Reports
 metricool reports list
-
-# Get report status
 metricool reports status --report-id REPORT_ID
 
-# Get report configuration
-metricool reports config
-
-# Set report configuration
-metricool reports config --set '{"key": "value"}'
-```
-
-### Brand/Account Management
-
-```bash
-# Get brand info
-metricool brand info
-
-# Update brand
-metricool brand update \
-  --name "New Brand Name" \
-  --timezone "Europe/Madrid"
-
-# List network connections
-metricool brand connections
-
-# Get brand images
-metricool brand images
-
-# User info
-metricool user
-
-# Subscription info
-metricool subscription
-```
-
-### Advertising
-
-```bash
-# List ad campaigns
-metricool ads campaigns
-
-# List ad groups
-metricool ads groups --campaign-id CAMPAIGN_ID
-
-# List ads
-metricool ads list --ad-group-id AD_GROUP_ID
-
-# List keywords
-metricool ads keywords --ad-group-id AD_GROUP_ID
-```
-
-### Performance Dashboards
-
-```bash
-# List dashboards
+# Performance dashboards
 metricool dashboard list
-
-# Create dashboard
-metricool dashboard create \
-  --name "Q1 2026 Performance" \
-  --description "First quarter metrics"
-
-# Get dashboard analytics
-metricool dashboard analytics \
-  --dashboard-id DASH_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-
-# Sync dashboard
+metricool dashboard create --name "Q1 2026"
+metricool dashboard analytics --dashboard-id DASH_ID --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 metricool dashboard sync --dashboard-id DASH_ID
 ```
 
-### Media
+### 🏢 Brand & Account
 
 ```bash
-# List images
+metricool brand info
+metricool brand update --name "New Name"
+metricool brand connections
+metricool brand images
+metricool user
+metricool subscription
+```
+
+### 📢 Advertising
+
+```bash
+metricool ads campaigns
+metricool ads groups --campaign-id CAMPAIGN_ID
+metricool ads list --ad-group-id AD_GROUP_ID
+metricool ads keywords --ad-group-id AD_GROUP_ID
+```
+
+### 🖼️ Media
+
+```bash
 metricool media images --limit 50
-
-# List videos
 metricool media videos --limit 50
-
-# Upload media
-metricool media upload \
-  --url "https://example.com/image.jpg" \
-  --filename "my-image.jpg" \
-  --content-type "image/jpeg"
-
-# Normalize external image URL
-metricool media normalize "https://external.com/image.jpg"
+metricool media upload --url "https://example.com/image.jpg" --filename "image.jpg" --content-type "image/jpeg"
+metricool media normalize "https://external-cdn.com/image.png"
 ```
 
-### Calendars
+### 🗓️ Calendars
 
 ```bash
-# List calendars
 metricool calendar list
-
-# List calendar events
-metricool calendar events \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-28T23:59:59
-
-# Create calendar
-metricool calendar create \
-  --name "Content Calendar" \
-  --description "Monthly content schedule"
+metricool calendar events --start 2026-02-01T00:00:00 --end 2026-02-28T23:59:59
+metricool calendar create --name "Content Calendar"
 ```
 
-### Misc Utilities
+### 🛠️ Utilities
 
 ```bash
-# Search GIFs
-metricool gif --query "funny cat" --limit 10 --rating g
-
-# Get trending GIFs
-metricool gif --limit 20
-
-# Account suggestions
+metricool best-time --blog-id 4846146
+metricool gif --query "celebration" --limit 5
 metricool suggestions twitter --query "marketing"
-metricool suggestions linkedin --query "tech companies"
-
-# Scheduler counters
 metricool counters
-
-# Health check
 metricool ping
 ```
 
 ## Date Handling
 
-**IMPORTANT:** Dates are passed as-is to the API. When you specify:
+Dates are passed **as-is** to the Metricool API. No UTC conversion.
 
 ```bash
---date "2026-02-16T11:45:00" --timezone "America/New_York"
+--date "2026-02-16T15:00:00" --timezone "America/New_York"
+# Sends exactly: dateTime: "2026-02-16T15:00:00", timezone: "America/New_York"
 ```
 
-The CLI will send `"2026-02-16T11:45:00"` with `timezone: "America/New_York"` exactly as provided. The date is **not** converted to UTC.
+All dates use ISO 8601 format: `YYYY-MM-DDTHH:mm:ss`
 
-## Examples
+## Agent Integration
 
-### Daily Workflow
+This CLI was designed for AI agent workflows. Combine with:
+
+- **[fal.ai](https://fal.ai)** for image generation → pipe URLs to `--media`
+- **[OpenClaw](https://github.com/openclaw/openclaw)** for cron-based scheduling
+- **jq** for data processing:
 
 ```bash
-# Check scheduled posts for today
-metricool post list --start 2026-02-16T00:00:00 --end 2026-02-16T23:59:59
-
-# Create a LinkedIn post for 3pm today
-metricool post create \
-  --text "Excited to share our latest insights on AI in marketing!" \
-  --network linkedin \
-  --date "2026-02-16T15:00:00" \
-  --timezone "America/New_York"
-
-# Check LinkedIn post performance for the last 2 weeks
+# Top 5 LinkedIn posts by engagement
 metricool analytics posts linkedin \
   --start 2026-02-01T00:00:00 \
   --end 2026-02-16T23:59:59 \
-  --sort engagement \
-  --order desc
+  | jq '[.[] | {text: .text[:50], engagement: .engagement}] | sort_by(-.engagement) | .[0:5]'
 ```
-
-### Competitor Analysis
-
-```bash
-# Add competitors
-metricool competitors add instagram --username competitor1
-metricool competitors add instagram --username competitor2
-
-# Track their posts
-metricool competitors posts instagram \
-  --id COMPETITOR_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-
-# Compare follower growth
-metricool competitors timelines \
-  --metric followers \
-  --competitor-id COMPETITOR_ID \
-  --start 2026-02-01T00:00:00 \
-  --end 2026-02-16T23:59:59
-```
-
-### AI-Powered Content Creation
-
-```bash
-# Generate LinkedIn post
-metricool ai generate \
-  --prompt "Write about the benefits of social media scheduling tools" \
-  --language en \
-  --tone professional \
-  --network linkedin
-
-# Shorten existing text
-metricool ai quick-action \
-  --text "This is a very long piece of text that needs to be more concise for social media posting" \
-  --action shorten
-
-# Schedule using natural language
-metricool ai schedule --text "next Monday at 9am"
-```
-
-## Tips
-
-- Use `--json` for scripting and automation
-- Set `METRICOOL_BLOG_ID` in `.env` to avoid typing `--blog-id` every time
-- All dates should be in ISO 8601 format: `YYYY-MM-DDTHH:mm:ss`
-- Combine commands with `jq` for powerful data processing:
-  ```bash
-  metricool analytics posts linkedin --start 2026-02-01 --end 2026-02-16 | jq '.posts | sort_by(.engagement)'
-  ```
-
-## Error Handling
-
-- Check API error messages in the console output
-- Verify your credentials in `.env`
-- Ensure blog ID is valid
-- Dates must be in correct format
 
 ## Contributing
 
-Issues and PRs welcome!
+Issues and PRs welcome. This tool covers the full Metricool API — if something's missing or broken, open an issue.
 
 ## License
 
 MIT
+
+---
+
+<p align="center">
+  Built with ☕ by <a href="https://purplehorizons.io">Purple Horizons</a> — Miami, FL
+</p>
