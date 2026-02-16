@@ -1,276 +1,499 @@
 # Metricool CLI
 
-A comprehensive command-line tool for managing Metricool social media posts and analytics.
+Full-featured command-line interface for the Metricool API.
 
 ## Installation
 
 ```bash
-cd /path/to/metricool-cli
 npm install
-npm link
+npm link  # Make globally available
 ```
 
 ## Configuration
 
-Set the following environment variables (or add to `.env` file):
+Create a `.env` file in the CLI directory:
 
-```bash
-METRICOOL_USER_TOKEN=your_user_token
-METRICOOL_USER_ID=your_user_id
-METRICOOL_BLOG_ID=your_default_blog_id
+```env
+METRICOOL_USER_TOKEN=your_user_token_here
+METRICOOL_USER_ID=your_user_id_here
+METRICOOL_BLOG_ID=your_default_blog_id_here
 ```
 
-Find your credentials:
-- **userToken**: Account Settings → API Token
-- **userId**: Your Metricool user ID
-- **blogId**: Brand ID (visible in browser URL when viewing a brand)
+Get your credentials from Metricool account settings.
 
-## Commands
+## Usage
 
-### List Brands
+All commands support:
+- `--blog-id <id>` — Override default blog ID
+- `--json` or `-j` — Output as JSON (default)
 
-Get all brands/profiles in your Metricool account:
+### Brands & Admin
 
 ```bash
+# List all brands
 metricool brands
+
+# Get best time to publish
+metricool best-time --blog-id 4846146
 ```
 
-### Best Time to Post
-
-Get the recommended best time to publish:
+### Posts
 
 ```bash
-metricool best-time
-metricool best-time --blog-id 12345
-```
+# List scheduled posts
+metricool post list --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 
-### Post Management
-
-#### List Posts
-
-List scheduled posts within a date range:
-
-```bash
-metricool post list --start "2026-02-17T00:00:00" --end "2026-02-18T23:59:59"
-metricool post list --start "2026-02-17T00:00:00" --end "2026-02-20T00:00:00" --timezone "America/New_York"
-```
-
-#### Create Post
-
-Create a new scheduled post:
-
-```bash
-# Simple text post to LinkedIn
+# Create a new post
 metricool post create \
-  --text "Hello world!" \
+  --text "Hello LinkedIn!" \
   --network linkedin \
-  --date "2026-02-17T12:00:00"
+  --date "2026-02-16T15:00:00" \
+  --timezone "America/New_York"
 
-# Multi-network post with image
+# Create with media
 metricool post create \
-  --text "Check out our new product!" \
-  --network linkedin,instagram,twitter \
-  --media "https://example.com/image.jpg" \
-  --date "2026-02-17T15:00:00"
+  --text "Check this out!" \
+  --network instagram,facebook \
+  --media "https://example.com/image1.jpg,https://example.com/image2.jpg"
 
-# Instagram Reel with first comment
-metricool post create \
-  --text "Amazing video!" \
-  --network instagram \
-  --media "https://example.com/video.mp4" \
-  --instagram-type REEL \
-  --first-comment "Link in bio 👆" \
-  --date "2026-02-17T18:00:00"
+# Update a post
+metricool post update POST_ID --text "Updated text"
 
-# Draft post
-metricool post create \
-  --text "Draft content here" \
-  --network linkedin \
-  --draft
+# Delete a post
+metricool post delete POST_ID
 
-# LinkedIn poll
-metricool post create \
-  --text "What's your favorite?" \
-  --network linkedin \
-  --linkedin-type poll \
-  --date "2026-02-17T10:00:00"
+# Post notes
+metricool post notes --post-id POST_ID
+metricool post notes --post-id POST_ID --note "Needs review"
+
+# Approval workflow
+metricool post approve --post-id POST_ID --status approved --comment "Looks good!"
+metricool post tasks --status pending
 ```
 
-**Important:** The `--network` parameter accepts comma-separated values that are converted to provider objects internally. Available networks:
-- `linkedin`
-- `instagram`
-- `twitter`
-- `facebook`
-- `tiktok`
-- `youtube`
-- `threads`
-- `bluesky`
-
-#### Update Post
-
-Update an existing scheduled post:
+### Analytics (Highest Priority)
 
 ```bash
-metricool post update 123456 --text "Updated content"
-metricool post update 123456 --date "2026-02-18T12:00:00"
-metricool post update 123456 --network linkedin,instagram
+# Time series for any metric
+metricool analytics timeline \
+  --metric followers \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Distribution data
+metricool analytics distribution \
+  --metric engagement \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Aggregated metrics
+metricool analytics aggregation \
+  --metric reach \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Posts analytics by network
+metricool analytics posts linkedin \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59 \
+  --sort engagement \
+  --order desc
+
+# Supported networks: instagram, linkedin, twitter, facebook, tiktok, threads, bluesky, pinterest
+
+# Reels analytics
+metricool analytics reels instagram \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Stories analytics
+metricool analytics stories instagram \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Hashtag analytics
+metricool analytics hashtags \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
 ```
 
-#### Delete Post
-
-Delete a scheduled post:
+### Competitors
 
 ```bash
-metricool post delete 123456
+# List competitors for a network
+metricool competitors list instagram
+
+# Add a competitor
+metricool competitors add instagram --username competitor_handle
+
+# Remove a competitor
+metricool competitors remove instagram --id COMPETITOR_ID
+
+# Get competitor posts
+metricool competitors posts instagram \
+  --id COMPETITOR_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Competitor timeline metrics
+metricool competitors timelines \
+  --metric followers \
+  --competitor-id COMPETITOR_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
 ```
 
-### Network Statistics
-
-Get analytics for a specific network:
+### Inbox / Conversations
 
 ```bash
-metricool stats instagram
-metricool stats linkedin
-metricool stats twitter
-metricool stats facebook
-metricool stats tiktok
-metricool stats youtube
+# List conversations
+metricool inbox list --network instagram --status unread
+
+# Reply to conversation
+metricool inbox reply \
+  --conversation-id CONV_ID \
+  --message "Thanks for reaching out!"
+
+# List post comments
+metricool inbox comments --network facebook --post-id POST_ID
+
+# Reply to comment
+metricool inbox comment-reply \
+  --comment-id COMMENT_ID \
+  --message "Thank you!"
+
+# List reviews
+metricool inbox reviews --network google
+
+# Reply to review
+metricool inbox review-reply \
+  --review-id REVIEW_ID \
+  --message "We appreciate your feedback!"
 ```
 
-### Media Management
-
-#### Normalize Image URL
-
-Convert an external image URL to a Metricool-hosted URL (critical for posting images from external sources like fal.ai):
+### Smart Links (Link in Bio)
 
 ```bash
-metricool media normalize "https://fal.ai/files/image.jpg"
+# List smart links
+metricool smartlinks list
+
+# Create a smart link
+metricool smartlinks create \
+  --title "My Website" \
+  --url "https://example.com" \
+  --description "Check out my site"
+
+# Update a smart link
+metricool smartlinks update \
+  --id LINK_ID \
+  --title "Updated Title" \
+  --url "https://newurl.com"
+
+# Delete a smart link
+metricool smartlinks delete --id LINK_ID
+
+# Get smart link analytics
+metricool smartlinks analytics \
+  --id LINK_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
 ```
 
-This validates that the URL is publicly accessible and transforms it into a Metricool repository URL that can be used in posts.
-
-#### Upload Media
-
-Create an S3 upload transaction:
+### AI Features
 
 ```bash
-metricool media upload --url "https://example.com/image.jpg" --filename "myimage.jpg"
+# Generate post copy
+metricool ai generate \
+  --prompt "Write a LinkedIn post about AI in marketing" \
+  --language en \
+  --tone professional \
+  --network linkedin
+
+# Regenerate post
+metricool ai regenerate \
+  --post-id POST_ID \
+  --tone casual
+
+# Quick actions (shorten, lengthen, rephrase, etc.)
+metricool ai quick-action \
+  --text "This is my post text that needs to be shortened" \
+  --action shorten \
+  --language en
+
+# Natural language scheduling
+metricool ai schedule \
+  --text "tomorrow at 3pm" \
+  --timezone "America/New_York"
+
+# Check scheduling job status
+metricool ai schedule-status --job-id JOB_ID
+
+# List available languages
+metricool ai languages
 ```
+
+### Post Library
+
+```bash
+# List library posts
+metricool library list --limit 50 --offset 0
+
+# Create library post
+metricool library create \
+  --text "Reusable post content" \
+  --media "https://example.com/image.jpg"
+
+# Update library post
+metricool library update \
+  --id POST_ID \
+  --text "Updated content"
+
+# Delete library post
+metricool library delete --id POST_ID
+```
+
+### Hashtag Tracker
+
+```bash
+# List tracked hashtags
+metricool hashtags list
+
+# Track a new hashtag
+metricool hashtags create --hashtag marketing
+
+# Get hashtag statistics
+metricool hashtags stats \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+```
+
+### Reports
+
+```bash
+# List reports
+metricool reports list
+
+# Get report status
+metricool reports status --report-id REPORT_ID
+
+# Get report configuration
+metricool reports config
+
+# Set report configuration
+metricool reports config --set '{"key": "value"}'
+```
+
+### Brand/Account Management
+
+```bash
+# Get brand info
+metricool brand info
+
+# Update brand
+metricool brand update \
+  --name "New Brand Name" \
+  --timezone "Europe/Madrid"
+
+# List network connections
+metricool brand connections
+
+# Get brand images
+metricool brand images
+
+# User info
+metricool user
+
+# Subscription info
+metricool subscription
+```
+
+### Advertising
+
+```bash
+# List ad campaigns
+metricool ads campaigns
+
+# List ad groups
+metricool ads groups --campaign-id CAMPAIGN_ID
+
+# List ads
+metricool ads list --ad-group-id AD_GROUP_ID
+
+# List keywords
+metricool ads keywords --ad-group-id AD_GROUP_ID
+```
+
+### Performance Dashboards
+
+```bash
+# List dashboards
+metricool dashboard list
+
+# Create dashboard
+metricool dashboard create \
+  --name "Q1 2026 Performance" \
+  --description "First quarter metrics"
+
+# Get dashboard analytics
+metricool dashboard analytics \
+  --dashboard-id DASH_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
+
+# Sync dashboard
+metricool dashboard sync --dashboard-id DASH_ID
+```
+
+### Media
+
+```bash
+# List images
+metricool media images --limit 50
+
+# List videos
+metricool media videos --limit 50
+
+# Upload media
+metricool media upload \
+  --url "https://example.com/image.jpg" \
+  --filename "my-image.jpg" \
+  --content-type "image/jpeg"
+
+# Normalize external image URL
+metricool media normalize "https://external.com/image.jpg"
+```
+
+### Calendars
+
+```bash
+# List calendars
+metricool calendar list
+
+# List calendar events
+metricool calendar events \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-28T23:59:59
+
+# Create calendar
+metricool calendar create \
+  --name "Content Calendar" \
+  --description "Monthly content schedule"
+```
+
+### Misc Utilities
+
+```bash
+# Search GIFs
+metricool gif --query "funny cat" --limit 10 --rating g
+
+# Get trending GIFs
+metricool gif --limit 20
+
+# Account suggestions
+metricool suggestions twitter --query "marketing"
+metricool suggestions linkedin --query "tech companies"
+
+# Scheduler counters
+metricool counters
+
+# Health check
+metricool ping
+```
+
+## Date Handling
+
+**IMPORTANT:** Dates are passed as-is to the API. When you specify:
+
+```bash
+--date "2026-02-16T11:45:00" --timezone "America/New_York"
+```
+
+The CLI will send `"2026-02-16T11:45:00"` with `timezone: "America/New_York"` exactly as provided. The date is **not** converted to UTC.
 
 ## Examples
 
-### Workflow: Post an AI-Generated Image
-
-1. Generate image with fal.ai (or any external service)
-2. Normalize the URL to Metricool format:
-   ```bash
-   NORMALIZED_URL=$(metricool media normalize "https://fal.ai/files/abc123.jpg")
-   ```
-3. Create post with normalized URL:
-   ```bash
-   metricool post create \
-     --text "Check out this AI-generated artwork!" \
-     --network instagram,linkedin \
-     --media "$NORMALIZED_URL" \
-     --date "2026-02-17T14:00:00"
-   ```
-
-### Schedule Week's Content
+### Daily Workflow
 
 ```bash
-# Monday motivation
+# Check scheduled posts for today
+metricool post list --start 2026-02-16T00:00:00 --end 2026-02-16T23:59:59
+
+# Create a LinkedIn post for 3pm today
 metricool post create \
-  --text "Start your week strong! 💪" \
-  --network linkedin,instagram \
-  --date "2026-02-17T09:00:00"
+  --text "Excited to share our latest insights on AI in marketing!" \
+  --network linkedin \
+  --date "2026-02-16T15:00:00" \
+  --timezone "America/New_York"
 
-# Wednesday tip
-metricool post create \
-  --text "Pro tip: Always normalize external image URLs before posting!" \
-  --network linkedin,twitter \
-  --date "2026-02-19T12:00:00"
-
-# Friday celebration
-metricool post create \
-  --text "Happy Friday! 🎉" \
-  --network instagram \
-  --instagram-type STORY \
-  --media "https://example.com/celebration.jpg" \
-  --date "2026-02-21T17:00:00"
+# Check LinkedIn post performance for the last 2 weeks
+metricool analytics posts linkedin \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59 \
+  --sort engagement \
+  --order desc
 ```
 
-## API Details
+### Competitor Analysis
 
-### Base URL
-```
-https://app.metricool.com/api
-```
+```bash
+# Add competitors
+metricool competitors add instagram --username competitor1
+metricool competitors add instagram --username competitor2
 
-### Authentication
+# Track their posts
+metricool competitors posts instagram \
+  --id COMPETITOR_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
 
-All requests include these parameters:
-- `userToken` (query param or `X-Mc-Auth` header)
-- `userId` (query param)
-- `blogId` (query param)
-
-### Key Endpoints Used
-
-- `GET /admin/simpleProfiles` - List brands
-- `GET /planner/best-time-to-publish` - Best posting time
-- `GET /v2/scheduler/posts` - List scheduled posts
-- `POST /v2/scheduler/posts` - Create post
-- `PUT /v2/scheduler/posts/{id}` - Update post
-- `DELETE /v2/scheduler/posts/{id}` - Delete post
-- `GET /v2/analytics/{network}/profile` - Network stats
-- `GET /actions/normalize/image/url` - Normalize image URL
-- `PUT /v2/media/s3/upload-transactions` - Upload media
-
-### Provider Format (Critical!)
-
-The Metricool API expects `providers` as an **array of objects**, not strings:
-
-✅ **Correct:**
-```json
-{
-  "providers": [
-    { "network": "linkedin" },
-    { "network": "instagram" }
-  ]
-}
+# Compare follower growth
+metricool competitors timelines \
+  --metric followers \
+  --competitor-id COMPETITOR_ID \
+  --start 2026-02-01T00:00:00 \
+  --end 2026-02-16T23:59:59
 ```
 
-❌ **Wrong:**
-```json
-{
-  "providers": ["linkedin", "instagram"]
-}
+### AI-Powered Content Creation
+
+```bash
+# Generate LinkedIn post
+metricool ai generate \
+  --prompt "Write about the benefits of social media scheduling tools" \
+  --language en \
+  --tone professional \
+  --network linkedin
+
+# Shorten existing text
+metricool ai quick-action \
+  --text "This is a very long piece of text that needs to be more concise for social media posting" \
+  --action shorten
+
+# Schedule using natural language
+metricool ai schedule --text "next Monday at 9am"
 ```
 
-The CLI handles this conversion automatically when you use `--network linkedin,instagram`.
+## Tips
 
-## Troubleshooting
+- Use `--json` for scripting and automation
+- Set `METRICOOL_BLOG_ID` in `.env` to avoid typing `--blog-id` every time
+- All dates should be in ISO 8601 format: `YYYY-MM-DDTHH:mm:ss`
+- Combine commands with `jq` for powerful data processing:
+  ```bash
+  metricool analytics posts linkedin --start 2026-02-01 --end 2026-02-16 | jq '.posts | sort_by(.engagement)'
+  ```
 
-**"blogId required" error:**
-- Set `METRICOOL_BLOG_ID` environment variable
-- Or pass `--blog-id` to each command
+## Error Handling
 
-**"API request failed: 401":**
-- Check your `METRICOOL_USER_TOKEN` and `METRICOOL_USER_ID`
-- Verify credentials in Metricool account settings
+- Check API error messages in the console output
+- Verify your credentials in `.env`
+- Ensure blog ID is valid
+- Dates must be in correct format
 
-**Post creation fails:**
-- Make sure date is in ISO 8601 format: `2026-02-17T12:00:00`
-- Verify timezone format: `America/New_York`
-- For external images, use `media normalize` first
+## Contributing
 
-**Media URLs not working:**
-- Always normalize external image URLs before using them in posts
-- Use `metricool media normalize <url>` first
+Issues and PRs welcome!
 
 ## License
 
 MIT
-
-## Author
-
-Built by Purple Horizons for the OpenClaw ecosystem.
