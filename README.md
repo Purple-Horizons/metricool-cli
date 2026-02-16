@@ -178,6 +178,9 @@ metricool ai quick-action --text "Long text that needs shortening" --action shor
 metricool ai schedule --text "next Monday at 9am" --timezone "America/New_York"
 metricool ai schedule-status --job-id JOB_ID
 
+# Regenerate post copy
+metricool ai regenerate --post-id 12345 --language en --tone casual
+
 # Available languages
 metricool ai languages
 ```
@@ -219,6 +222,10 @@ metricool hashtags stats --start 2026-02-01T00:00:00 --end 2026-02-16T23:59:59
 # Reports
 metricool reports list
 metricool reports status --report-id REPORT_ID
+
+# Get or set report configuration
+metricool reports config
+metricool reports config --set '{"key":"value"}'
 
 # Performance dashboards
 metricool dashboard list
