@@ -1983,6 +1983,520 @@ program
   .option('-j, --json', 'Output as JSON')
   .action(getStats);
 
+// ============================================================================
+// AGENCY & TEAM MANAGEMENT COMMANDS
+// ============================================================================
+
+// --- Agency Customization Kit functions ---
+
+async function agencyDetails(options) {
+  const data = await apiRequest('/v2/agency-CK/details');
+  output(data, options.json);
+}
+
+async function agencyGet(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}`);
+  output(data, options.json);
+}
+
+async function agencyUpdate(options) {
+  const body = {};
+  if (options.agencyLogo) body.agencyLogo = options.agencyLogo;
+  if (options.loginLogo) body.loginLogo = options.loginLogo;
+  if (options.faviconLogo) body.faviconLogo = options.faviconLogo;
+  if (options.reportLogo) body.reportLogo = options.reportLogo;
+  if (options.mailLogo) body.mailLogo = options.mailLogo;
+  if (options.mailMessage) body.mailMessage = options.mailMessage;
+  if (options.mailReplyTo) body.mailReplyTo = options.mailReplyTo;
+  if (options.supportChat !== undefined) body.supportChat = options.supportChat === 'true';
+  if (options.helpArticles !== undefined) body.helpArticles = options.helpArticles === 'true';
+
+  const fields = Object.keys(body).join(',');
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/properties?fields=${fields}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function agencyTestMail(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/test-mail`, {
+    method: 'POST',
+    body: JSON.stringify({ to: options.to }),
+  });
+  output(data, options.json);
+}
+
+// --- Agency End-Clients functions ---
+
+async function agencyClientsList(options) {
+  const params = options.filter ? `?filter=${encodeURIComponent(options.filter)}` : '';
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/end-clients${params}`);
+  output(data, options.json);
+}
+
+async function agencyClientsAdd(options) {
+  const endClient = {
+    agencyId: parseInt(options.agencyId),
+    username: options.username,
+  };
+  if (options.name) endClient.name = options.name;
+  if (options.lastname) endClient.lastname = options.lastname;
+  if (options.email) endClient.email = options.email;
+  if (options.language) endClient.language = options.language;
+  if (options.timezone) endClient.timezone = options.timezone;
+  if (options.enabled !== undefined) endClient.enabled = options.enabled === 'true';
+
+  const body = { endClient };
+  if (options.mailMessage) body.mailMessage = options.mailMessage;
+
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/end-clients`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function agencyClientsDelete(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/end-clients/${options.clientId}`, {
+    method: 'DELETE',
+  });
+  output(data, options.json);
+}
+
+async function agencyClientsAssignments(options) {
+  const body = {};
+  if (options.assignments) body.assignments = JSON.parse(options.assignments);
+  if (options.isDefaultEmail !== undefined) body.isDefaultEmail = options.isDefaultEmail === 'true';
+  if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+  if (options.useNewLink !== undefined) body.useNewActivationLink = options.useNewLink === 'true';
+
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/end-clients/${options.clientId}/assignments`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function agencyClientsResendLink(options) {
+  const body = {};
+  if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/end-clients/${options.clientId}/activation-link`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+// --- Agency Team Members functions ---
+
+async function agencyTeamList(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members`);
+  output(data, options.json);
+}
+
+async function agencyTeamRoles(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members/roles`);
+  output(data, options.json);
+}
+
+async function agencyTeamAdd(options) {
+  const emails = options.emails.split(',').map(e => e.trim());
+  const body = {
+    emails,
+    roleId: parseInt(options.roleId),
+  };
+
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function agencyTeamUpdate(options) {
+  const body = { teamMemberRoleId: parseInt(options.roleId) };
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members/${options.userId}?fields=teamMemberRoleId`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function agencyTeamDelete(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members/${options.userId}`, {
+    method: 'DELETE',
+  });
+  output(data, options.json);
+}
+
+async function agencyTeamResendInvite(options) {
+  const data = await apiRequest(`/v2/agency-CK/${options.agencyId}/team-members/${options.userId}/invitation-email`, {
+    method: 'POST',
+  });
+  output(data, options.json);
+}
+
+// --- Brand Roles functions ---
+
+async function brandRolesList(options) {
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/roles`);
+  output(data, options.json);
+}
+
+async function brandRolesCreate(options) {
+  const body = {
+    name: options.name,
+    actions: {},
+  };
+  if (options.description) body.description = options.description;
+  if (options.color) body.color = options.color;
+  if (options.actions) body.actions = JSON.parse(options.actions);
+
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/roles`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function brandRolesUpdate(options) {
+  const body = {};
+  const fields = [];
+  if (options.name) { body.name = options.name; fields.push('name'); }
+  if (options.description) { body.description = options.description; fields.push('description'); }
+  if (options.color) { body.color = options.color; fields.push('color'); }
+  if (options.actions) { body.actions = JSON.parse(options.actions); fields.push('actions'); }
+
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/roles/${options.roleId}?fields=${fields.join(',')}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function brandRolesDelete(options) {
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/roles/${options.roleId}`, {
+    method: 'DELETE',
+  });
+  output(data, options.json);
+}
+
+// --- Brand Role Collaborators functions ---
+
+async function collaboratorsList(options) {
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/collaborators`);
+  output(data, options.json);
+}
+
+async function collaboratorsAdd(options) {
+  const body = {};
+  if (options.isDefaultEmail !== undefined) body.isDefaultEmail = options.isDefaultEmail === 'true';
+  if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+  if (options.assignments) body.assignments = JSON.parse(options.assignments);
+  if (options.useNewLink !== undefined) body.useNewActivationLink = options.useNewLink === 'true';
+
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/collaborators/${options.email}`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function collaboratorsUpdate(options) {
+  const body = {};
+  if (options.isDefaultEmail !== undefined) body.isDefaultEmail = options.isDefaultEmail === 'true';
+  if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+  if (options.assignments) body.assignments = JSON.parse(options.assignments);
+  if (options.useNewLink !== undefined) body.useNewActivationLink = options.useNewLink === 'true';
+
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/collaborators/${options.collaboratorId}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function collaboratorsDelete(options) {
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/collaborators/${options.collaboratorId}`, {
+    method: 'DELETE',
+  });
+  output(data, options.json);
+}
+
+async function collaboratorsResendLink(options) {
+  const body = {};
+  if (options.isDefaultEmail !== undefined) body.isDefaultEmail = options.isDefaultEmail === 'true';
+  if (options.invitationMessage) body.invitationCustomMessage = options.invitationMessage;
+  if (options.useNewLink !== undefined) body.useNewActivationLink = options.useNewLink === 'true';
+
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/collaborators/${options.collaboratorId}/activation-link`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  output(data, options.json);
+}
+
+async function collaboratorsDeleteAssignment(options) {
+  const data = await apiRequest(`/v2/authorization/${options.userId || USER_ID}/assignment?brandId=${options.brandId}`, {
+    method: 'DELETE',
+  });
+  output(data, options.json);
+}
+
+// --- Agency command tree ---
+
+const agency = program.command('agency').description('Agency & team management');
+
+// Agency Customization Kit
+const customize = agency.command('customize').description('Agency Customization Kit');
+
+customize
+  .command('details')
+  .description('Get agency details for current user')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyDetails);
+
+customize
+  .command('get')
+  .description('Get agency customization by ID')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyGet);
+
+customize
+  .command('update')
+  .description('Update agency customization properties')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .option('--agency-logo <url>', 'Agency logo URL')
+  .option('--login-logo <url>', 'Login logo URL')
+  .option('--favicon-logo <url>', 'Favicon logo URL')
+  .option('--report-logo <url>', 'Report logo URL')
+  .option('--mail-logo <url>', 'Mail logo URL')
+  .option('--mail-message <text>', 'Mail message')
+  .option('--mail-reply-to <email>', 'Mail reply-to address')
+  .option('--support-chat <bool>', 'Enable support chat (true/false)')
+  .option('--help-articles <bool>', 'Enable help articles (true/false)')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyUpdate);
+
+customize
+  .command('test-mail')
+  .description('Send test mail for agency customization')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('--to <email>', 'Recipient email')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTestMail);
+
+// Agency End-Clients
+const clients = agency.command('clients').description('Agency end-client management');
+
+clients
+  .command('list')
+  .description('List agency end-clients')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .option('-f, --filter <json>', 'JSON filter (e.g. {"username":"..."})')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyClientsList);
+
+clients
+  .command('add')
+  .description('Add a new end-client')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-u, --username <username>', 'Client username')
+  .option('-n, --name <name>', 'First name')
+  .option('--lastname <name>', 'Last name')
+  .option('-e, --email <email>', 'Email')
+  .option('-l, --language <lang>', 'Language')
+  .option('-z, --timezone <tz>', 'Timezone')
+  .option('--enabled <bool>', 'Enabled (true/false)')
+  .option('--mail-message <text>', 'Invitation mail message')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyClientsAdd);
+
+clients
+  .command('delete')
+  .description('Delete an end-client')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-c, --client-id <id>', 'End-client ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyClientsDelete);
+
+clients
+  .command('assignments')
+  .description('Update brand assignments for an end-client')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-c, --client-id <id>', 'End-client ID')
+  .option('--assignments <json>', 'JSON array of brand assignments')
+  .option('--is-default-email <bool>', 'Use default email (true/false)')
+  .option('--invitation-message <text>', 'Custom invitation message')
+  .option('--use-new-link <bool>', 'Use new activation link (true/false)')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyClientsAssignments);
+
+clients
+  .command('resend-link')
+  .description('Resend activation link to an end-client')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-c, --client-id <id>', 'End-client ID')
+  .option('--invitation-message <text>', 'Custom invitation message')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyClientsResendLink);
+
+// Agency Team Members
+const team = agency.command('team').description('Agency team member management');
+
+team
+  .command('list')
+  .description('List team members')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamList);
+
+team
+  .command('roles')
+  .description('List team member roles')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamRoles);
+
+team
+  .command('add')
+  .description('Add team members by email')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-e, --emails <emails>', 'Comma-separated emails')
+  .requiredOption('-r, --role-id <id>', 'Role ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamAdd);
+
+team
+  .command('update')
+  .description('Update a team member role')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-u, --user-id <id>', 'Team member user ID')
+  .requiredOption('-r, --role-id <id>', 'New role ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamUpdate);
+
+team
+  .command('delete')
+  .description('Remove a team member')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-u, --user-id <id>', 'Team member user ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamDelete);
+
+team
+  .command('resend-invite')
+  .description('Resend invitation email to a team member')
+  .requiredOption('-a, --agency-id <id>', 'Agency ID')
+  .requiredOption('-u, --user-id <id>', 'Team member user ID')
+  .option('-j, --json', 'Output as JSON')
+  .action(agencyTeamResendInvite);
+
+// Brand Roles
+const roles = agency.command('roles').description('Brand role management');
+
+roles
+  .command('list')
+  .description('List brand roles')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(brandRolesList);
+
+roles
+  .command('create')
+  .description('Create a brand role')
+  .requiredOption('-n, --name <name>', 'Role name')
+  .option('-d, --description <desc>', 'Role description')
+  .option('-c, --color <color>', 'Role color')
+  .option('--actions <json>', 'JSON object of role actions (viewAnalytics, fullAccessPlanner, etc.)')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(brandRolesCreate);
+
+roles
+  .command('update')
+  .description('Update a brand role')
+  .requiredOption('-r, --role-id <id>', 'Role ID')
+  .option('-n, --name <name>', 'Role name')
+  .option('-d, --description <desc>', 'Role description')
+  .option('-c, --color <color>', 'Role color')
+  .option('--actions <json>', 'JSON object of role actions')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(brandRolesUpdate);
+
+roles
+  .command('delete')
+  .description('Delete a brand role')
+  .requiredOption('-r, --role-id <id>', 'Role ID')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(brandRolesDelete);
+
+// Brand Role Collaborators
+const collaborators = agency.command('collaborators').description('Brand role collaborator management');
+
+collaborators
+  .command('list')
+  .description('List brand role collaborators')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsList);
+
+collaborators
+  .command('add')
+  .description('Add a collaborator by email')
+  .requiredOption('-e, --email <email>', 'Collaborator email')
+  .option('--assignments <json>', 'JSON array of brand role assignments')
+  .option('--is-default-email <bool>', 'Use default email (true/false)')
+  .option('--invitation-message <text>', 'Custom invitation message')
+  .option('--use-new-link <bool>', 'Use new activation link (true/false)')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsAdd);
+
+collaborators
+  .command('update')
+  .description('Update collaborator brand role assignments')
+  .requiredOption('-c, --collaborator-id <id>', 'Collaborator ID')
+  .option('--assignments <json>', 'JSON array of brand role assignments')
+  .option('--is-default-email <bool>', 'Use default email (true/false)')
+  .option('--invitation-message <text>', 'Custom invitation message')
+  .option('--use-new-link <bool>', 'Use new activation link (true/false)')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsUpdate);
+
+collaborators
+  .command('delete')
+  .description('Delete a collaborator')
+  .requiredOption('-c, --collaborator-id <id>', 'Collaborator ID')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsDelete);
+
+collaborators
+  .command('resend-link')
+  .description('Resend activation link to a collaborator')
+  .requiredOption('-c, --collaborator-id <id>', 'Collaborator ID')
+  .option('--is-default-email <bool>', 'Use default email (true/false)')
+  .option('--invitation-message <text>', 'Custom invitation message')
+  .option('--use-new-link <bool>', 'Use new activation link (true/false)')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsResendLink);
+
+collaborators
+  .command('delete-assignment')
+  .description('Delete a brand role assignment')
+  .requiredOption('--brand-id <id>', 'Brand ID')
+  .option('-u, --user-id <id>', 'User ID (defaults to current user)')
+  .option('-j, --json', 'Output as JSON')
+  .action(collaboratorsDeleteAssignment);
+
 // Only parse if run directly (not imported)
 if (import.meta.url === `file://${process.argv[1]}`) {
   program.parse();
