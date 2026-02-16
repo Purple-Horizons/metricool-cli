@@ -217,8 +217,8 @@ async function analyticsTimeline(options) {
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
@@ -234,8 +234,8 @@ async function analyticsDistribution(options) {
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
@@ -251,8 +251,8 @@ async function analyticsAggregation(options) {
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
@@ -267,8 +267,8 @@ async function analyticsPosts(network, options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   if (options.sort) params.set('sort', options.sort);
   if (options.order) params.set('order', options.order);
@@ -285,8 +285,8 @@ async function analyticsReels(network, options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
@@ -301,8 +301,8 @@ async function analyticsStories(network, options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
@@ -317,8 +317,8 @@ async function analyticsHashtags(options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('start', options.start);
-  if (options.end) params.set('end', options.end);
+  if (options.start) params.set('from', options.start);
+  if (options.end) params.set('to', options.end);
   if (options.timezone) params.set('timezone', options.timezone);
   
   const queryString = params.toString();
