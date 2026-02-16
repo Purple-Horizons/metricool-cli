@@ -1,0 +1,29 @@
+{
+  "name": "metricool-cli",
+  "version": "1.0.0",
+  "description": "Command-line tool for managing Metricool social media posts",
+  "type": "module",
+  "main": "metricool.js",
+  "bin": {
+    "metricool": "./metricool.js"
+  },
+  "scripts": {
+    "test": "node metricool.js brands"
+  },
+  "keywords": [
+    "metricool",
+    "social-media",
+    "cli",
+    "scheduling",
+    "instagram",
+    "linkedin",
+    "twitter"
+  ],
+  "author": "Purple Horizons",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7",
+    "node-fetch": "^3.3.2"
+  }
+}
