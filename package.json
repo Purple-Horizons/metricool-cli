@@ -8,7 +8,7 @@
     "metricool": "./metricool.js"
   },
   "scripts": {
-    "test": "node metricool.js brands"
+    "test": "node --test test/metricool.test.js"
   },
   "keywords": [
     "metricool",

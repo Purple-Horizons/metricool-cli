@@ -1983,5 +1983,10 @@ program
   .option('-j, --json', 'Output as JSON')
   .action(getStats);
 
-// Parse and execute
-program.parse();
+// Only parse if run directly (not imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  program.parse();
+}
+
+// Export testable functions
+export { addAuthParams, apiRequest, USER_TOKEN, USER_ID, DEFAULT_BLOG_ID, BASE_URL };
