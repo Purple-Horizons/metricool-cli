@@ -51,7 +51,7 @@ metricool post notes --post-id POST_ID --note "Looks good, approved"
 metricool best-time
 ```
 
-**Workflow tip**: When the user says "draft a post", default to `--draft` so they can review it in Metricool before it goes live. Show them the post ID so they can find it in the planner. Only skip `--draft` if they explicitly say "post it now" or "schedule it".
+**Workflow tip**: Always use `--draft` by default. The user wants to review posts in Metricool before they go live — even scheduled posts. Create the post with both `--draft` and `--date` so it's saved with the right schedule but won't auto-publish. Show them the post ID and let them know they can approve it in the Metricool planner when ready. The only time to skip `--draft` is if the user explicitly says something like "post it now", "publish immediately", or "make it live".
 
 ### Checking analytics and performance
 
