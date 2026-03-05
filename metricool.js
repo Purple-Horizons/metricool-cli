@@ -447,9 +447,9 @@ async function inboxComments(options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.network) params.set('network', options.network);
+  if (options.network) params.set('provider', options.network.toUpperCase());
   if (options.postId) params.set('postId', options.postId);
-  
+
   const queryString = params.toString();
   const endpoint = `/v2/inbox/post-comments${queryString ? `?${queryString}` : ''}`;
   
@@ -480,8 +480,8 @@ async function inboxReviews(options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.network) params.set('network', options.network);
-  
+  if (options.network) params.set('provider', options.network.toUpperCase());
+
   const queryString = params.toString();
   const endpoint = `/v2/inbox/reviews${queryString ? `?${queryString}` : ''}`;
   
