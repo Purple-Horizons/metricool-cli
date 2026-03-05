@@ -211,19 +211,27 @@ async function deletePost(id, options) {
 // ANALYTICS COMMANDS
 // ============================================================================
 
+// Helper: Convert ISO datetime or date string to YYYYMMDD for v1 stats endpoints
+function toYYYYMMDD(dateStr) {
+  if (!dateStr) return dateStr;
+  // Already YYYYMMDD
+  if (/^\d{8}$/.test(dateStr)) return dateStr;
+  // Strip time portion and dashes
+  return dateStr.replace(/T.*$/, '').replace(/-/g, '');
+}
+
 async function analyticsTimeline(options) {
   const blogId = options.blogId || DEFAULT_BLOG_ID;
   if (!blogId) throw new Error('blogId required');
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('from', options.start);
-  if (options.end) params.set('to', options.end);
-  if (options.timezone) params.set('timezone', options.timezone);
-  
+  if (options.start) params.set('start', toYYYYMMDD(options.start));
+  if (options.end) params.set('end', toYYYYMMDD(options.end));
+
   const queryString = params.toString();
-  const endpoint = `/v2/analytics/timelines/${options.metric}${queryString ? `?${queryString}` : ''}`;
-  
+  const endpoint = `/stats/timeline/${options.metric}${queryString ? `?${queryString}` : ''}`;
+
   const data = await apiRequest(endpoint, {}, blogId);
   output(data, options.json);
 }
@@ -234,13 +242,12 @@ async function analyticsDistribution(options) {
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('from', options.start);
-  if (options.end) params.set('to', options.end);
-  if (options.timezone) params.set('timezone', options.timezone);
-  
+  if (options.start) params.set('start', toYYYYMMDD(options.start));
+  if (options.end) params.set('end', toYYYYMMDD(options.end));
+
   const queryString = params.toString();
-  const endpoint = `/v2/analytics/distribution/${options.metric}${queryString ? `?${queryString}` : ''}`;
-  
+  const endpoint = `/stats/distribution/${options.metric}${queryString ? `?${queryString}` : ''}`;
+
   const data = await apiRequest(endpoint, {}, blogId);
   output(data, options.json);
 }
@@ -251,13 +258,12 @@ async function analyticsAggregation(options) {
   if (!options.metric) throw new Error('--metric required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('from', options.start);
-  if (options.end) params.set('to', options.end);
-  if (options.timezone) params.set('timezone', options.timezone);
-  
+  if (options.start) params.set('start', toYYYYMMDD(options.start));
+  if (options.end) params.set('end', toYYYYMMDD(options.end));
+
   const queryString = params.toString();
-  const endpoint = `/v2/analytics/aggregation/${options.metric}${queryString ? `?${queryString}` : ''}`;
-  
+  const endpoint = `/stats/aggregation/${options.metric}${queryString ? `?${queryString}` : ''}`;
+
   const data = await apiRequest(endpoint, {}, blogId);
   output(data, options.json);
 }
@@ -301,13 +307,12 @@ async function analyticsStories(network, options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.start) params.set('from', options.start);
-  if (options.end) params.set('to', options.end);
-  if (options.timezone) params.set('timezone', options.timezone);
-  
+  if (options.start) params.set('start', toYYYYMMDD(options.start));
+  if (options.end) params.set('end', toYYYYMMDD(options.end));
+
   const queryString = params.toString();
-  const endpoint = `/v2/analytics/stories/${network}${queryString ? `?${queryString}` : ''}`;
-  
+  const endpoint = `/stats/${network}/stories${queryString ? `?${queryString}` : ''}`;
+
   const data = await apiRequest(endpoint, {}, blogId);
   output(data, options.json);
 }
@@ -408,10 +413,10 @@ async function inboxList(options) {
   if (!blogId) throw new Error('blogId required');
 
   const params = new URLSearchParams();
-  if (options.network) params.set('network', options.network);
+  if (options.network) params.set('provider', options.network.toUpperCase());
   if (options.status) params.set('status', options.status);
   if (options.limit) params.set('limit', options.limit);
-  
+
   const queryString = params.toString();
   const endpoint = `/v2/inbox/conversations${queryString ? `?${queryString}` : ''}`;
   
