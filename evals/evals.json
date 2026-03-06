@@ -1,0 +1,23 @@
+{
+  "skill_name": "metricool",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft a LinkedIn post about our latest product update and schedule it for tomorrow at 2pm",
+      "expected_output": "Creates a draft or scheduled post via the metricool CLI targeting LinkedIn with appropriate content and scheduling",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "How did our Instagram do last month? Show me the highlights",
+      "expected_output": "Pulls Instagram analytics for the past month and presents a readable summary with key metrics and takeaways",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Check our inbox for any unanswered messages",
+      "expected_output": "Retrieves inbox messages across networks and summarizes which need responses",
+      "files": []
+    }
+  ]
+}

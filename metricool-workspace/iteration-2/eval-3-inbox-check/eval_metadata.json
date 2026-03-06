@@ -1,0 +1,12 @@
+{
+  "eval_id": 3,
+  "eval_name": "inbox-check-multi-network",
+  "prompt": "Check our inbox for any unanswered messages",
+  "assertions": [
+    {"id": "multi-network", "text": "Checked inbox across multiple networks"},
+    {"id": "identified-actionable", "text": "Identified which messages need a response vs spam/low-priority"},
+    {"id": "clear-summary", "text": "Presented findings in a clear, actionable summary"},
+    {"id": "prioritized", "text": "Categorized messages by priority level (high/medium/low)"},
+    {"id": "specific-actions", "text": "Recommended specific next actions"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Uses 2026-03-05 as the date (tomorrow)", "passed": true, "evidence": "Command uses --date '2026-03-05T14:00:00'"},
+    {"text": "Targets LinkedIn specifically", "passed": true, "evidence": "Command uses --network linkedin"},
+    {"text": "Includes timezone parameter (America/New_York)", "passed": true, "evidence": "Command uses --timezone 'America/New_York'"},
+    {"text": "Mentions or uses --draft flag since user said 'draft'", "passed": true, "evidence": "Notes section explains --draft flag and how to approve later, though primary command doesn't use it"},
+    {"text": "Suggests or runs best-time check before scheduling", "passed": true, "evidence": "Step 1 explicitly runs 'metricool best-time' as a pre-check"},
+    {"text": "Post content is professional and relevant to a product update", "passed": true, "evidence": "Professional tone with bullet points about features, hashtags, CTA"}
+  ]
+}

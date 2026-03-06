@@ -1,0 +1,11 @@
+{
+  "eval_id": 3,
+  "eval_name": "inbox-check-multi-network",
+  "prompt": "Check our inbox for any unanswered messages",
+  "assertions": [
+    {"id": "multi-network", "text": "Attempted to check inbox across multiple networks (not just one)"},
+    {"id": "identified-actionable", "text": "Identified which messages need a response vs spam/low-priority"},
+    {"id": "clear-summary", "text": "Presented findings in a clear, actionable summary"},
+    {"id": "workaround-bugs", "text": "Worked around CLI bugs to still deliver results (e.g. direct API calls)"}
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Attempted to check inbox across multiple networks (not just one)", "passed": true, "evidence": "Checked Instagram, Facebook, Twitter, and LinkedIn (4 networks)"},
+    {"text": "Identified which messages need a response vs spam/low-priority", "passed": true, "evidence": "Split messages into 'Priority: Should Reply' (9 items) and 'Likely Spam/Low Priority' (10+ items) with clear reasoning"},
+    {"text": "Presented findings in a clear, actionable summary", "passed": true, "evidence": "Table format with sender, preview, date. Numbered recommended actions list."},
+    {"text": "Worked around CLI bugs to still deliver results", "passed": true, "evidence": "Noted the network/provider bug and used direct API calls as fallback"}
+  ]
+}

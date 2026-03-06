@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "instagram-analytics-summary",
+  "prompt": "How did our Instagram do last month? Show me the highlights",
+  "assertions": [
+    {"id": "pulled-real-data", "text": "Retrieved actual data from the API (not placeholder/fake data)"},
+    {"id": "multiple-metrics", "text": "Checked more than one type of analytics (e.g. posts + reels, or posts + engagement)"},
+    {"id": "readable-summary", "text": "Presented findings in readable format with clear takeaways (not raw JSON)"},
+    {"id": "actionable-insights", "text": "Included recommendations or actionable next steps"},
+    {"id": "correct-date-range", "text": "Used February 2026 as the date range"}
+  ]
+}

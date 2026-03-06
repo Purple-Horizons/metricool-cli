@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Retrieved actual data from the API (not placeholder/fake data)", "passed": true, "evidence": "Shows the same real post data from the API"},
+    {"text": "Checked more than one type of analytics", "passed": false, "evidence": "Only ran posts command. Tried timeline and aggregation but they 404'd. Did not try reels or stories."},
+    {"text": "Presented findings in readable format with clear takeaways (not raw JSON)", "passed": false, "evidence": "Included raw JSON block in the output. Summary is brief and lacks context/comparison."},
+    {"text": "Included recommendations or actionable next steps", "passed": false, "evidence": "Only says 'good engagement' and 'would need more data points'. No specific recommendations."},
+    {"text": "Used February 2026 as the date range", "passed": true, "evidence": "Commands use February 2026 dates"}
+  ]
+}

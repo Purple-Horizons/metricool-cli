@@ -1,0 +1,11 @@
+{
+  "eval_id": 3,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Checked inbox across multiple networks", "passed": true, "evidence": "Checked Instagram, Facebook, Twitter, LinkedIn (4 networks)"},
+    {"text": "Identified which messages need a response vs spam/low-priority", "passed": true, "evidence": "Split into High Priority (8), Medium Priority (6), Low Priority/Spam (11) with clear reasoning for each"},
+    {"text": "Presented findings in a clear, actionable summary", "passed": true, "evidence": "Well-structured with summary table, per-message quotes, sender handles, dates, and context"},
+    {"text": "Categorized messages by priority level (high/medium/low)", "passed": true, "evidence": "Three explicit tiers: HIGH PRIORITY, MEDIUM PRIORITY, LOW PRIORITY / SPAM"},
+    {"text": "Recommended specific next actions", "passed": true, "evidence": "6 numbered recommended actions with specific handles and timeframes"}
+  ]
+}

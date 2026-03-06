@@ -1,0 +1,11 @@
+{
+  "eval_id": 2,
+  "config": "with_skill",
+  "expectations": [
+    {"text": "Retrieved actual data from the API (not placeholder/fake data)", "passed": true, "evidence": "Shows real data — OpenClaw Miami promo with 45 likes, 509 reach, Reel with 718 views"},
+    {"text": "Checked more than one type of analytics", "passed": true, "evidence": "Ran 7 commands: posts, reels, stories, timeline, engagement, impressions, reach aggregations"},
+    {"text": "Presented findings in readable format with clear takeaways (not raw JSON)", "passed": true, "evidence": "Well-structured report with sections, tables, bullet points, engagement rate context vs industry averages"},
+    {"text": "Included recommendations or actionable next steps", "passed": true, "evidence": "5 key takeaways including posting frequency, Mia voice, reel hooks, Stories usage"},
+    {"text": "Used February 2026 as the date range", "passed": true, "evidence": "Commands used 2026-02-01 to 2026-02-28"}
+  ]
+}

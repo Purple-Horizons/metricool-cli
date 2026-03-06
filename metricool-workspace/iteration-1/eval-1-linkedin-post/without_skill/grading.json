@@ -1,0 +1,12 @@
+{
+  "eval_id": 1,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Uses 2026-03-05 as the date (tomorrow)", "passed": true, "evidence": "Command uses --date '2026-03-05T14:00:00'"},
+    {"text": "Targets LinkedIn specifically", "passed": true, "evidence": "Command uses --network linkedin"},
+    {"text": "Includes timezone parameter (America/New_York)", "passed": true, "evidence": "Command uses --timezone 'America/New_York'"},
+    {"text": "Mentions or uses --draft flag since user said 'draft'", "passed": true, "evidence": "Includes a full 'Alternative: Create as Draft First' section with --draft flag"},
+    {"text": "Suggests or runs best-time check before scheduling", "passed": false, "evidence": "No mention of best-time command. Jumped straight to post creation."},
+    {"text": "Post content is professional and relevant to a product update", "passed": true, "evidence": "Strong professional tone, numbered list, CTA, relevant hashtags"}
+  ]
+}

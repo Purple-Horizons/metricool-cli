@@ -1,0 +1,10 @@
+{
+  "eval_id": 3,
+  "config": "without_skill",
+  "expectations": [
+    {"text": "Attempted to check inbox across multiple networks (not just one)", "passed": false, "evidence": "Only tried Instagram, then gave up after the error"},
+    {"text": "Identified which messages need a response vs spam/low-priority", "passed": false, "evidence": "Could not retrieve any messages due to CLI bug"},
+    {"text": "Presented findings in a clear, actionable summary", "passed": false, "evidence": "Output is just an error report with no actual inbox data"},
+    {"text": "Worked around CLI bugs to still deliver results", "passed": false, "evidence": "Gave up and recommended using the web dashboard instead of trying alternative approaches"}
+  ]
+}

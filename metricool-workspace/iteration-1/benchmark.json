@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "skill_name": "metricool",
+    "timestamp": "2026-03-05T04:40:00Z",
+    "evals_run": ["linkedin-post-draft", "instagram-analytics-summary", "inbox-check-multi-network"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_name": "linkedin-post-draft",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6,
+      "time_seconds": 36.9,
+      "tokens": 11834
+    },
+    {
+      "eval_name": "linkedin-post-draft",
+      "config": "without_skill",
+      "pass_rate": 0.83,
+      "passed": 5,
+      "total": 6,
+      "time_seconds": 58.6,
+      "tokens": 22791
+    },
+    {
+      "eval_name": "instagram-analytics-summary",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 5,
+      "total": 5,
+      "time_seconds": null,
+      "tokens": null
+    },
+    {
+      "eval_name": "instagram-analytics-summary",
+      "config": "without_skill",
+      "pass_rate": 0.4,
+      "passed": 2,
+      "total": 5,
+      "time_seconds": null,
+      "tokens": null
+    },
+    {
+      "eval_name": "inbox-check-multi-network",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 4,
+      "total": 4,
+      "time_seconds": null,
+      "tokens": null
+    },
+    {
+      "eval_name": "inbox-check-multi-network",
+      "config": "without_skill",
+      "pass_rate": 0.0,
+      "passed": 0,
+      "total": 4,
+      "time_seconds": null,
+      "tokens": null
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "mean_pass_rate": 1.0,
+      "mean_time_seconds": 36.9,
+      "mean_tokens": 11834
+    },
+    "without_skill": {
+      "mean_pass_rate": 0.41,
+      "mean_time_seconds": 58.6,
+      "mean_tokens": 22791
+    },
+    "delta": {
+      "pass_rate": "+0.59",
+      "time_seconds": "-21.7",
+      "tokens": "-10957"
+    }
+  },
+  "notes": [
+    "Eval 1 (LinkedIn post): With-skill suggested best-time check; baseline did not. Both produced good content.",
+    "Eval 2 (Instagram analytics): With-skill pulled multiple data types (posts + reels), gave actionable insights. Baseline only got posts, included raw JSON, no recommendations.",
+    "Eval 3 (Inbox check): With-skill worked around CLI bugs to get real data, categorized spam vs priority. Baseline gave up at first error.",
+    "Evals 2 and 3 were run in main session due to subagent Bash permission issues — timing data only available for eval 1."
+  ]
+}

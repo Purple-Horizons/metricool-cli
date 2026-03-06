@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "linkedin-post-draft",
+  "prompt": "Draft a LinkedIn post about our latest product update and schedule it for tomorrow at 2pm",
+  "assertions": [
+    {"id": "correct-date", "text": "Uses 2026-03-05 as the date (tomorrow)"},
+    {"id": "correct-network", "text": "Targets LinkedIn specifically"},
+    {"id": "correct-timezone", "text": "Includes timezone parameter (America/New_York)"},
+    {"id": "draft-awareness", "text": "Mentions or uses --draft flag since user said 'draft'"},
+    {"id": "best-time-check", "text": "Suggests or runs best-time check before scheduling"},
+    {"id": "professional-content", "text": "Post content is professional and relevant to a product update"}
+  ]
+}

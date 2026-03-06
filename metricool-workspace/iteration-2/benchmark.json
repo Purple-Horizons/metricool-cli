@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "skill_name": "metricool",
+    "timestamp": "2026-03-05T05:20:00Z",
+    "evals_run": ["linkedin-post-draft", "instagram-analytics-summary", "inbox-check-multi-network"],
+    "runs_per_configuration": 1,
+    "iteration": 2
+  },
+  "runs": [
+    {
+      "eval_name": "linkedin-post-draft",
+      "config": "with_skill",
+      "pass_rate": 0.83,
+      "passed": 5,
+      "total": 6,
+      "time_seconds": 29.9,
+      "tokens": 11495
+    },
+    {
+      "eval_name": "instagram-analytics-summary",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 5,
+      "total": 5,
+      "time_seconds": 51.2,
+      "tokens": 14991
+    },
+    {
+      "eval_name": "inbox-check-multi-network",
+      "config": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 5,
+      "total": 5,
+      "time_seconds": 130.3,
+      "tokens": 40459
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "mean_pass_rate": 0.94,
+      "mean_time_seconds": 70.5,
+      "mean_tokens": 22315
+    }
+  },
+  "notes": [
+    "Iteration 2: CLI bugs fixed (analytics endpoints, inbox provider param). All 3 subagents ran successfully with Bash access.",
+    "Eval 1: Only miss was --draft flag. The skill instructs to default to --draft when user says 'draft', but subagent interpreted 'draft and schedule' as schedule-only. Ambiguous prompt.",
+    "Eval 2: Perfect score. Pulled 7 commands covering posts, reels, stories, timeline, and aggregations. Produced a polished report with tables and actionable insights.",
+    "Eval 3: Perfect score. Checked 4 networks, categorized 23 conversations into 3 priority tiers, identified bot patterns, noted remaining CLI bugs, gave 6 specific next actions."
+  ]
+}
