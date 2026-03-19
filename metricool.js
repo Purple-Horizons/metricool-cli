@@ -153,9 +153,12 @@ async function createPost(options) {
   }
 
   // Add Instagram-specific data
-  if (options.instagramType) {
+  if (options.instagramType || options.collaborators) {
     postData.instagramData = {
-      type: options.instagramType,
+      ...(options.instagramType && { type: options.instagramType }),
+      ...(options.collaborators && {
+        collaborators: options.collaborators.split(',').map(u => ({ username: u.trim().replace(/^@/, '') })),
+      }),
     };
   }
 
@@ -186,6 +189,12 @@ async function updatePost(id, options) {
   }
   if (options.media) {
     updateData.media = options.media.split(',').map(m => m.trim());
+  }
+  if (options.collaborators) {
+    updateData.instagramData = {
+      ...updateData.instagramData,
+      collaborators: options.collaborators.split(',').map(u => ({ username: u.trim().replace(/^@/, '') })),
+    };
   }
 
   const data = await apiRequest(`/v2/scheduler/posts/${id}`, {
@@ -1298,6 +1307,7 @@ post
   .option('--linkedin-type <type>', 'LinkedIn post type (POST, poll)')
   .option('--instagram-type <type>', 'Instagram post type (POST, REEL, STORY)')
   .option('--first-comment <text>', 'First comment text')
+  .option('--collaborators <usernames>', 'Instagram collaborators (comma-separated usernames, max 5)')
   .option('-b, --blog-id <id>', 'Blog ID')
   .option('-j, --json', 'Output as JSON')
   .action(createPost);
@@ -1310,6 +1320,7 @@ post
   .option('-m, --media <urls>', 'Media URLs (comma-separated)')
   .option('-d, --date <datetime>', 'New publication date (ISO 8601)')
   .option('-z, --timezone <tz>', 'Timezone')
+  .option('--collaborators <usernames>', 'Instagram collaborators (comma-separated usernames, max 5)')
   .option('-b, --blog-id <id>', 'Blog ID')
   .option('-j, --json', 'Output as JSON')
   .action(updatePost);
