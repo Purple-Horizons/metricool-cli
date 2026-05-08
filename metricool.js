@@ -3,8 +3,9 @@
 import { Command } from 'commander';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
+import { realpathSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -2514,7 +2515,7 @@ collaborators
   .action(collaboratorsDeleteAssignment);
 
 // Only parse if run directly (not imported)
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   program.parse();
 }
 
